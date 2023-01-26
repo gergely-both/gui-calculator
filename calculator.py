@@ -74,7 +74,7 @@ class Calculator:
 
     def change_sign(self):
         sign = "-"
-        if self.numeric_input and (len(self.numeric_input) >= 1 or self.numeric_input[0] != "0"):
+        if self.numeric_input and (len(self.numeric_input) > 1 or self.numeric_input[0] != "0"):
             if self.numeric_input[0] == sign:
                 del self.numeric_input[0]
             else:
@@ -108,7 +108,6 @@ class Calculator:
     def input_operator(self, operator):
         previous_value = "".join(self.numeric_input)
         self.numeric_input.clear()
-
         if not self.query:
             if operator == "=":
                 self.query.append(previous_value if previous_value else "0")
