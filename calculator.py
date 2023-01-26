@@ -1,6 +1,5 @@
 import tkinter as tk
 
-
 button_properties = {
     "width": 9,
     "relief": "raised"
@@ -57,30 +56,29 @@ class Calculator:
         self.button_div = tk.Button(master, text="mr", command=lambda: self.parse_input("mr"), **button_properties)
         self.button_div.grid(row=4, column=4)
 
-
-        self.user_input = []
+        self.opset = {"+", "-", "*", "/", "="}
+        self.numeric_input = []
         self.query = []
         self.memory = "0"
 
-
     def display_input(self):
-        self.label.config(text="".join(self.user_input))
+        self.label.config(text="".join(self.numeric_input))
 
     def dotted_value(self):
-        if not self.user_input:
-            self.user_input.extend(["0", "."]) 
+        if not self.numeric_input:
+            self.numeric_input.extend(["0", "."]) 
             self.display_input()
-        elif "." not in self.user_input:
-            self.user_input.append(".")
+        elif "." not in self.numeric_input:
+            self.numeric_input.append(".")
             self.display_input()
 
     def change_sign(self):
         sign = "-"
-        if self.user_input and (len(self.user_input) != 1 or self.user_input[0] != "0"):
-            if self.user_input[0] == sign:
-                del self.user_input[0]
+        if self.numeric_input and (len(self.numeric_input) >= 1 or self.numeric_input[0] != "0"):
+            if self.numeric_input[0] == sign:
+                del self.numeric_input[0]
             else:
-                self.user_input.insert(0, sign)    
+                self.numeric_input.insert(0, sign)    
             self.display_input()
         elif len(self.query) == 1 and "0" not in self.query:
             if sign in self.query[0]:
@@ -90,83 +88,71 @@ class Calculator:
             self.label.config(text=self.query[0])
 
     def clear_input(self):
-        self.user_input.clear()
+        self.numeric_input.clear()
         self.label.config(text=0)
 
     def remove_last(self):
-        if self.user_input:
-            self.user_input.pop()
-            self.label.config(text="".join(self.user_input) or 0)
+        if self.numeric_input:
+            self.numeric_input.pop()
+            self.label.config(text="".join(self.numeric_input) or 0)
 
     def memory_operate(self, value):
         operation = value[1]
-        self.memory = str(eval(self.memory + operation + ("".join(self.user_input) or self.query[0])))
-        self.user_input.clear()
+        self.memory = str(eval(self.memory + operation + ("".join(self.numeric_input) or self.query[0])))
+        self.numeric_input.clear()
   
     def memory_recall(self):
-        self.user_input = [i for i in self.memory]
+        self.numeric_input = [i for i in self.memory]
         self.display_input()
 
-    def input_operator(self, value):
-        number = "".join(self.user_input) or "0"
-        self.user_input.clear()
-        if not self.query:
-            if value == "=":
-                self.query.append(number)
-            else:
-                self.query.extend([number, value])
-        elif len(self.query) == 1:
-            if number and number != "0":
-                if value == "=":
-                    self.query.clear()
-                    self.query.append(number)
-                else:
-                    self.query.clear()
-                    self.query.extend([number, value])
-            else:
-                if value == "=":
-                    pass
-                else:
-                    self.query.append(value)
-        elif len(self.query) > 1:
-            if number and number != "0":
-                if value == "=":
-                    self.query.extend([number, value])
-                    self.equals_to(value)
-                else:
-                    self.query.extend([number, value])
-                    self.equals_to(value)
-            else:
-                if value == "=":
-                    self.query.pop()
-                else:
-                    self.query[1] = value
+    def input_operator(self, operator):
+        previous_value = "".join(self.numeric_input)
+        self.numeric_input.clear()
 
-    def equals_to(self, value):
-        self.query.pop()
+        if not self.query:
+            if operator == "=":
+                self.query.append(previous_value if previous_value else "0")
+            else:
+                self.query.extend([previous_value if previous_value else "0", operator])
+        elif len(self.query) == 1:
+            if operator == "=":
+                self.query[0] = previous_value if previous_value else self.query[0]
+            else:
+                self.query.append(operator)
+        elif len(self.query) == 2:
+            if previous_value:
+                self.query.append(previous_value)
+                self.equals_to(operator)
+            elif operator == "=" and not previous_value:
+                self.query.append(self.query[0])
+                self.equals_to(operator)
+            elif operator != "=" and not previous_value:
+                self.query[-1] = operator
+
+    def equals_to(self, operator):
         total = eval("".join(self.query))
         self.query.clear()
-        if value == "=":
+        if operator == "=":
             self.query.append(str(total))
         else:
-            self.query.extend([str(total), value])
+            self.query.extend([str(total), operator])
         self.label.config(text=total)
 
     def input_digit(self, value):
-        if self.user_input:
-            if len(self.user_input) == 1 and self.user_input[0] == "0":
+        if self.numeric_input:
+            if len(self.numeric_input) == 1 and self.numeric_input[0] == "0":
                 if value != "0":
-                    self.user_input[0] = str(value)
-                    self.label.config(text=self.user_input[0])
+                    self.numeric_input[0] = str(value)
+                    self.label.config(text=self.numeric_input[0])
             else:
-                self.user_input.append(str(value))
+                self.numeric_input.append(str(value))
                 self.display_input()
         else:
-            self.user_input.append(str(value))
-            self.label.config(text=self.user_input[0])
+            self.numeric_input.append(str(value))
+            self.label.config(text=self.numeric_input[0])
 
     def input_symbol(self, value):
-        if value in {"+", "-", "*", "/", "="}:
+        if value in self.opset:
             self.input_operator(value)
         elif value == ".":
             self.dotted_value()
