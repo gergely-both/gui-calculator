@@ -93,11 +93,6 @@ class Calculator:
         self.numeric_input.clear()
         self.label.config(text=0)
 
-    # def clear_all(self):
-    #     self.numeric_input.clear()
-    #     self.query.clear()
-    #     self.label.config(text=0)
-
     def remove_last(self):
         if self.numeric_input:
             self.numeric_input.pop()
