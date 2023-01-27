@@ -93,10 +93,10 @@ class Calculator:
         self.numeric_input.clear()
         self.label.config(text=0)
 
-    def clear_all(self):
-        self.numeric_input.clear()
-        self.query.clear()
-        self.label.config(text=0)
+    # def clear_all(self):
+    #     self.numeric_input.clear()
+    #     self.query.clear()
+    #     self.label.config(text=0)
 
     def remove_last(self):
         if self.numeric_input:
@@ -138,6 +138,7 @@ class Calculator:
     def equals_to(self, operator):
         unrounded = eval("".join(self.query))
         total = round(unrounded, 10)
+        total = int(total) if int(total) == total else total
         self.query.clear()
         if operator == "=":
             self.query.append(str(total))
@@ -170,7 +171,8 @@ class Calculator:
         elif value == "C":
             self.clear_input()
         elif value == "AC":
-            self.clear_all()
+            self.clear_input()
+            self.query.clear()
         elif value in {"m+", "m-"}:
             self.memory_operate(value)
         elif value == "mr":
