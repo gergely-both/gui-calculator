@@ -62,6 +62,7 @@ class Calculator:
         self.numeric_input = []
         self.query = []
         self.memory = "0"
+        self.history = []
 
     def display_input(self):
         self.label.config(text="".join(self.numeric_input))
@@ -116,8 +117,11 @@ class Calculator:
             else:
                 self.query.extend([previous_value if previous_value else "0", operator])
         elif len(self.query) == 1:
-            if operator == "=":
+            if operator == "=" and not self.history:
                 self.query[0] = previous_value if previous_value else self.query[0]
+            elif operator == "=" and len(self.history) == 3:
+                self.query.extend([self.history[1], self.history[2]])
+                self.equals_to(operator)
             else:
                 self.query.append(operator)
         elif len(self.query) == 2:
@@ -131,6 +135,10 @@ class Calculator:
                 self.query[-1] = operator
 
     def equals_to(self, operator):
+
+        self.history.clear()
+        self.history.extend(self.query)
+        
         unrounded = eval("".join(self.query))
         total = round(unrounded, 10)
         total = int(total) if int(total) == total else total
