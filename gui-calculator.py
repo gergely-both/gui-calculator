@@ -133,10 +133,10 @@ class Calculator:
         elif len(self.query) == 1:
             if operator == "=" and previous_value:
                 self.query[0] = previous_value
-            elif operator == "=" and not previous_value:
+            elif operator == "=" and not previous_value and self.history:
                 self.query.extend(self.history[1:])
                 self.calculate(operator)
-            else:
+            elif operator != "=":
                 if previous_value:
                     self.query[0] = previous_value
                 self.query.append(operator)
