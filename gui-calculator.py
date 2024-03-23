@@ -1,10 +1,12 @@
 import tkinter as tk
 import math
 
+
 button_properties = {
     "width": 9,
     "relief": "raised"
 }
+
 
 class Calculator:
     def __init__(self, master):
@@ -82,11 +84,11 @@ class Calculator:
                 self.input_symbol(value)
 
     def input_number(self, value):
+        """appends to empty list; replaces leading zero or appends further"""
         if self.numeric_input:
-            if len(self.numeric_input) == 1 and self.numeric_input[0] == "0":
-                if value != "0":
-                    self.numeric_input[0] = str(value)
-                    self.label.config(text=self.numeric_input[0])
+            if self.numeric_input[0] == "0" and value != "0":
+                self.numeric_input[0] = str(value)
+                self.label.config(text=self.numeric_input[0])
             else:
                 self.numeric_input.append(str(value))
                 self.display_input()
@@ -95,6 +97,7 @@ class Calculator:
             self.label.config(text=self.numeric_input[0])
 
     def input_symbol(self, value):
+        """dispatches by mathematical operator or other function"""
         if value in self.opset:
             self.input_operator(value)
         elif value == ".":
@@ -118,30 +121,35 @@ class Calculator:
             self.make_squared()
 
     def input_operator(self, operator):
+        """number|operator|number stage finder; reads input, appends further or calculates"""
         previous_value = "".join(self.numeric_input)
         self.numeric_input.clear()
+        
         if not self.query:
-            if operator == "=":
-                self.query.append(previous_value if previous_value else "0")
-            else:
-                self.query.extend([previous_value if previous_value else "0", operator])
+            self.query.append(previous_value if previous_value else "0")
+            if operator != "=":
+                self.query.append(operator)
+
         elif len(self.query) == 1:
-            if operator == "=" and not self.history:
-                self.query[0] = previous_value if previous_value else self.query[0]
-            elif operator == "=" and len(self.history) == 3:
-                self.query.extend([self.history[1], self.history[2]])
+            if operator == "=" and previous_value:
+                self.query[0] = previous_value
+            elif operator == "=" and not previous_value:
+                self.query.extend(self.history[1:])
                 self.calculate(operator)
             else:
+                if previous_value:
+                    self.query[0] = previous_value
                 self.query.append(operator)
+
         elif len(self.query) == 2:
-            if previous_value:
+            if not previous_value:
+                if operator == "=":
+                    del self.query[1]
+                else:
+                    self.query[-1] = operator
+            else:
                 self.query.append(previous_value)
                 self.calculate(operator)
-            elif operator == "=" and not previous_value:
-                self.query.append(self.query[0])
-                self.calculate(operator)
-            elif operator != "=" and not previous_value:
-                self.query[-1] = operator
 
     def calculate(self, operator):
         self.history.clear()
