@@ -1,4 +1,5 @@
 import tkinter as tk
+import math
 
 button_properties = {
     "width": 9,
@@ -57,12 +58,18 @@ class Calculator:
         self.button_add.grid(row=4, column=3)
         self.button_memr = tk.Button(master, text="mr", command=lambda: self.parse_input("mr"), **button_properties)
         self.button_memr.grid(row=4, column=4)
-
-        self.opset = {"+", "-", "*", "/", "="}
-        self.numeric_input = []
-        self.query = []
-        self.memory = "0"
-        self.history = []
+        self.button_sqrt = tk.Button(master, text="√", command=lambda: self.parse_input("√"), **button_properties)
+        self.button_sqrt.grid(row=5, column=4)
+        self.button_squared = tk.Button(master, text="^2", command=lambda: self.parse_input("^2"), **button_properties)
+        self.button_squared.grid(row=5, column=3)
+        self.button_PI = tk.Button(master, text="π", command=lambda: self.parse_input("π"), **button_properties)
+        self.button_PI.grid(row=5, column=2)
+        
+        self.opset = {"+", "-", "*", "/", "="} # math operators collection
+        self.numeric_input = [] # for query creation
+        self.query = [] # for executing calculations; numbers and symbols to evaluate
+        self.memory = "0" # zero initial value
+        self.history = [] # memory for repeating operations
 
     def display_input(self):
         self.label.config(text="".join(self.numeric_input))
@@ -90,7 +97,31 @@ class Calculator:
                 self.query[0] = sign + self.query[0]
             self.label.config(text=self.query[0])
 
-    def clear_input(self):
+    def make_sqrt(self):
+        if self.numeric_input:
+            sqrt_result = math.sqrt(float("".join(self.numeric_input)))
+            sqrt_pruned = int(sqrt_result) if int(sqrt_result) == sqrt_result else sqrt_result
+            self.query.append(str(sqrt_pruned))
+            self.numeric_input.clear()
+        elif not self.numeric_input and len(self.query)==1:
+            sqrt_result = math.sqrt(float(self.query[0]))
+            sqrt_pruned = int(sqrt_result) if int(sqrt_result) == sqrt_result else sqrt_result
+            self.query[0] = str(sqrt_pruned)
+        self.label.config(text=sqrt_pruned)
+
+    def make_squared(self):
+        if self.numeric_input:
+            squared_result = float("".join(self.numeric_input)) ** 2
+            squared_pruned = int(squared_result) if int(squared_result) == squared_result else squared_result
+            self.query.append(str(squared_pruned))
+            self.numeric_input.clear()
+        elif not self.numeric_input and len(self.query)==1:
+            squared_result = float(self.query[0]) ** 2
+            squared_pruned = int(squared_result) if int(squared_result) == squared_result else squared_result
+            self.query[0] = str(squared_pruned)
+        self.label.config(text=squared_pruned)
+
+    def clear_user_input(self):
         self.numeric_input.clear()
         self.label.config(text=0)
 
@@ -149,7 +180,7 @@ class Calculator:
             self.query.extend([str(total), operator])
         self.label.config(text=total)
 
-    def input_digit(self, value):
+    def input_number(self, value):
         if self.numeric_input:
             if len(self.numeric_input) == 1 and self.numeric_input[0] == "0":
                 if value != "0":
@@ -172,22 +203,30 @@ class Calculator:
         elif value == "BACK":
             self.remove_last()
         elif value == "C":
-            self.clear_input()
+            self.clear_user_input()
         elif value == "AC":
-            self.clear_input()
+            self.clear_user_input()
             self.query.clear()
         elif value in {"m+", "m-"}:
             self.memory_operate(value)
         elif value == "mr":
             self.memory_recall()
-
+        elif value == "√":
+            self.make_sqrt()
+        elif value == "^2":
+            self.make_squared()
+            
     def parse_input(self, value):
         if type(value) == int:
-            self.input_digit(value)
+            self.input_number(value)
         elif type(value) == str:
-            self.input_symbol(value)
+            if value == "π":
+                self.input_number(math.pi)
+            else:
+                self.input_symbol(value)
 
         
 root = tk.Tk()
 app = Calculator(root)
 root.mainloop()
+
