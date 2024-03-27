@@ -67,11 +67,11 @@ class Calculator:
         self.button_PI = tk.Button(master, text="π", command=lambda: self.parse_input("π"), **button_properties)
         self.button_PI.grid(row=5, column=2)
         
-        self.opset = {"+", "-", "*", "/", "="} # math operators collection
-        self.numeric_input = [] # for query creation
-        self.query = [] # for executing calculations; numbers and symbols to evaluate
-        self.memory = "0" # zero initial value
-        self.history = [] # memory for repeating operations
+        self.opset = {"+", "-", "*", "/", "="} # mathematical operators collection
+        self.numeric_input = [] # numeric user input for query making
+        self.query = [] # query for calculation containing numbers and operators
+        self.memory = "0" # zero initial value for memory
+        self.history = [] # calculator memory to repeat last calculation
 
     def parse_input(self, value):
         """dispatcher of int or str value type; special case: math pi"""
@@ -218,6 +218,10 @@ class Calculator:
             sqrt_result = math.sqrt(float(self.query[0]))
             sqrt_pruned = int(sqrt_result) if int(sqrt_result) == sqrt_result else sqrt_result
             self.query[0] = str(sqrt_pruned)
+        elif not self.numeric_input and len(self.query)==2:
+            sqrt_result = math.sqrt(float(self.query[0]))
+            sqrt_pruned = int(sqrt_result) if int(sqrt_result) == sqrt_result else sqrt_result
+            self.query[0] = str(sqrt_pruned)
         self.label.config(text=sqrt_pruned)
 
     def make_squared(self):
@@ -230,10 +234,14 @@ class Calculator:
             squared_result = float(self.query[0]) ** 2
             squared_pruned = int(squared_result) if int(squared_result) == squared_result else squared_result
             self.query[0] = str(squared_pruned)
+        elif not self.numeric_input and len(self.query)==2:
+            squared_result = float(self.query[0]) ** 2
+            squared_pruned = int(squared_result) if int(squared_result) == squared_result else squared_result
+            self.query[0] = str(squared_pruned)
         self.label.config(text=squared_pruned)
 
-        
-root = tk.Tk()
-app = Calculator(root)
-root.mainloop()
 
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Calculator(root)
+    root.mainloop()
