@@ -9,6 +9,7 @@ button_properties = {
 
 
 class Calculator:
+    """Python calculator with basic arithmetic operations and memory functions."""
     def __init__(self, master):
         self.master = master
         self.master.title("Python calculator")
@@ -74,7 +75,7 @@ class Calculator:
         self.history = [] # calculator memory to repeat last calculation
 
     def parse_input(self, value):
-        """dispatcher of int or str value type; special case: math pi"""
+        """input dispatcher for numeric, operator, or function value types"""
         if type(value) == int:
             self.input_number(value)
         elif type(value) == str:
@@ -152,6 +153,7 @@ class Calculator:
                 self.calculate(operator)
 
     def calculate(self, operator):
+        """evaluates query, rounds result, updates query, and label text"""
         self.history.clear()
         self.history.extend(self.query)
         unrounded = eval("".join(self.query))
@@ -165,18 +167,22 @@ class Calculator:
         self.label.config(text=total)
 
     def clear_user_input(self):
+        """clears current numeric input and label text"""
         self.numeric_input.clear()
         self.label.config(text=0)
 
     def remove_last(self):
+        """removes last character from numeric input and updates label text"""
         if self.numeric_input:
             self.numeric_input.pop()
             self.label.config(text="".join(self.numeric_input) or "0")
         
     def display_input(self):
+        """displays current numeric input on label"""
         self.label.config(text="".join(self.numeric_input))
 
     def dot_value(self):
+        """appends dot to numeric input if not present"""
         if not self.numeric_input:
             self.numeric_input.extend(["0", "."]) 
             self.display_input()
@@ -185,6 +191,7 @@ class Calculator:
             self.display_input()
 
     def swap_sign(self):
+        """swaps sign of numeric input or query"""
         sign = "-"
         if self.numeric_input and (len(self.numeric_input) > 1 or self.numeric_input[0] != "0"):
             if self.numeric_input[0] == sign:
@@ -200,15 +207,18 @@ class Calculator:
             self.label.config(text=self.query[0])
 
     def memory_operate(self, value):
+        """adds or subtracts current numeric input or query from memory"""
         operation = "+" if value[1] == "+" else "-"
         self.memory = str(eval(self.memory + operation + ("".join(self.numeric_input) or self.query[0])))
         self.numeric_input.clear()
   
     def memory_recall(self):
+        """recalls memory value to query or numeric input"""
         self.numeric_input = [char for char in self.memory]
         self.display_input()
             
     def make_sqrt(self):
+        """calculates square root of numeric input or query and updates label text"""
         if self.numeric_input:
             sqrt_result = math.sqrt(float("".join(self.numeric_input)))
             sqrt_pruned = int(sqrt_result) if int(sqrt_result) == sqrt_result else sqrt_result
@@ -225,6 +235,7 @@ class Calculator:
         self.label.config(text=sqrt_pruned)
 
     def make_squared(self):
+        """calculates square of numeric input or query and updates label text"""
         if self.numeric_input:
             squared_result = float("".join(self.numeric_input)) ** 2
             squared_pruned = int(squared_result) if int(squared_result) == squared_result else squared_result
